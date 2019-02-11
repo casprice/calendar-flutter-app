@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "405389955393",
+    "firebase_url": "https://design-challenge-events.firebaseio.com",
+    "project_id": "design-challenge-events",
+    "storage_bucket": "design-challenge-events.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405389955393:android:95576651f7db4797",
+        "android_client_info": {
+          "package_name": "com.example.parkinsonsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405389955393-3bk75dtle2du6gc9rvc8qa6nja785jkc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqyLYNW65vQYSUjFJJXnf5WsxccgfHSXg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
