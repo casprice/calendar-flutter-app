@@ -9,7 +9,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Calendar',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
       home: new MyHomePage(title: 'Calendar'),
     );
@@ -45,22 +45,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DateTime _currentDate = new DateTime.now();
-  DateTime _currentDate2 = new DateTime.now();
 
   DateTime _date = new DateTime.now();
   TimeOfDay _time = new TimeOfDay.now();
 
   String _currentMonth = '';
-  static Widget _eventIcon = new Container(
-    decoration: new BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(700)),
-        border: Border.all(color: Colors.orange[900], width: 3.0)),
-    /*
-    child: new Icon(
-      Icons.radio_button_unchecked,
-      color: Colors.orange[900],
-    ),*/
-  );
 
   // Select Date
   Future<Null> _selectDate(BuildContext context) async {
@@ -76,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _date = picked;
       });
-    }
+    };
   }
 
   Future<Null> _selectTime(BuildContext context) async {
@@ -98,18 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       new DateTime(2018, 12, 10): [
         new Event(
           date: new DateTime(2018, 12, 10),
-          title: 'Event 1',
-          icon: _eventIcon,
-        ),
-        new Event(
-          date: new DateTime(2018, 12, 10),
-          title: 'Event 2',
-          icon: _eventIcon,
-        ),
-        new Event(
-          date: new DateTime(2018, 12, 10),
-          title: 'Event 3',
-          icon: _eventIcon,
+          title: 'Event',
         ),
       ],
     },
@@ -125,32 +103,12 @@ class _MyHomePageState extends State<MyHomePage> {
         new Event(
           date: new DateTime(2018, 12, 25),
           title: 'Event 5',
-          icon: _eventIcon,
-        ));
-
-    _markedDateMap.add(
-        new DateTime(2018, 12, 10),
-        new Event(
-          date: new DateTime(2018, 12, 10),
-          title: 'Event 4',
-          icon: _eventIcon,
         ));
 
     _markedDateMap.addAll(new DateTime(2018, 12, 11), [
       new Event(
         date: new DateTime(2018, 12, 11),
         title: 'Event 1',
-        icon: _eventIcon,
-      ),
-      new Event(
-        date: new DateTime(2018, 12, 11),
-        title: 'Event 2',
-        icon: _eventIcon,
-      ),
-      new Event(
-        date: new DateTime(2018, 12, 11),
-        title: 'Event 3',
-        icon: _eventIcon,
       ),
     ]);
     super.initState();
@@ -162,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
       // Switch to day pressed
       onDayPressed: (DateTime date, List<Event> events) {
-        this.setState(() => _currentDate2 = date);
+        this.setState(() => _currentDate = date);
         events.forEach((event) => print(event.title));
       },
 
@@ -170,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
       weekFormat: false,
       markedDatesMap: _markedDateMap,
       height: 420.0,
-      selectedDateTime: _currentDate2,
+      selectedDateTime: _currentDate,
       customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateShowIcon: true,
       markedDateIconMaxShown: 1,
@@ -181,14 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
         return event.icon;
       },
 
-      selectedDayTextStyle: TextStyle(
-        color: Colors.lightBlue[900],
-      ),
-      selectedDayButtonColor: Colors.lightBlue[100],
       todayTextStyle: TextStyle(
         color: Colors.white,
       ),
-      todayButtonColor: Colors.lightBlue[800],
+      todayButtonColor: Colors.deepPurple[300],
+      selectedDayTextStyle: TextStyle(
+        color: Colors.deepPurple,
+      ),
+      selectedDayButtonColor: Colors.deepPurple[100],
+
       weekdayTextStyle: TextStyle (
         color: Colors.black,
       ),
@@ -198,83 +157,91 @@ class _MyHomePageState extends State<MyHomePage> {
 
       minSelectedDate: _currentDate,
       maxSelectedDate: _currentDate.add(Duration(days: 60)),
-//      inactiveDateColor: Colors.black12,
       onCalendarChanged: (DateTime date) {
         this.setState(() => _currentMonth = DateFormat.yMMM().format(date));
       },
     );
 
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text(widget.title),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              //custom icon
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.0),
-                child: _calendarCarousel,
-              ), // This trailing comma makes auto-formatting nicer for build methods.
+      appBar: new AppBar(
+        title: new Text(widget.title),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: null,
+        child: Icon(Icons.add),
+        tooltip: 'Add Event',
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            //custom icon
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16.0),
+              child: _calendarCarousel,
+            ), // This trailing comma makes auto-formatting nicer for build methods.
 
-              //custom icon without header
-              Container(
-                margin: EdgeInsets.only(
-                  top: 30.0,
-                  bottom: 16.0,
-                  left: 16.0,
-                  right: 16.0,
-                ),
-                child: new Row(
-                  children: <Widget>[
-                    //new Text('Date selected: ${_date.toString()}'),
-                    Expanded(
-                        child: Text(
-                          _currentMonth,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24.0,
-                          ),
-                        )),
-                    // left arrow
-                    new IconButton(
-                      icon: Icon(Icons.keyboard_arrow_left),
-                      onPressed: () {
-                        setState(() {
-                          _currentDate2 =
-                              _currentDate2.subtract(Duration(days: 30));
-                          _currentMonth =
-                              DateFormat.yMMM().format(_currentDate2);
-                        });
-                      },
-                    ),
-                    // calendar day selection
-                    new IconButton(
-                        icon: Icon(Icons.calendar_today),
-                        onPressed: (){_selectDate(context);}
-                    ),
-                    // right arrow
-                    new IconButton(
-                      icon: Icon(Icons.keyboard_arrow_right),
-                      onPressed: () {
-                        setState(() {
-                          _currentDate2 = _currentDate2.add(Duration(days: 30));
-                          _currentMonth =
-                              DateFormat.yMMM().format(_currentDate2);
-                        });
-                      },
-                    ),
-                  ],
-                ),
+            //custom icon without header
+            Container(
+             margin: EdgeInsets.only(
+               top: 30.0,
+               bottom: 16.0,
+               left: 16.0,
+               right: 16.0,
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.0),
-                child: _calendarCarouselNoHeader,
+
+              child: new Row(
+                children: <Widget>[
+                  //new Text('Date selected: ${_date.toString()}'),
+                  Expanded(
+                    child: Text(
+                      _currentMonth,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24.0,
+                      ),
+                    )
+                  ),
+
+                  // left arrow
+                  new IconButton(
+                    icon: Icon(Icons.keyboard_arrow_left),
+                    onPressed: () {
+                      setState(() {
+                        _currentDate =
+                          _currentDate.subtract(Duration(days: 30));
+                        _currentMonth =
+                          DateFormat.yMMM().format(_currentDate);
+                      });
+                    },
+                  ),
+                  // calendar day selection
+                  new IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: (){_selectDate(context);}
+                  ),
+                  // right arrow
+                  new IconButton(
+                    icon: Icon(Icons.keyboard_arrow_right),
+                    onPressed: () {
+                      setState(() {
+                        _currentDate = _currentDate.add(Duration(days: 30));
+                        _currentMonth = DateFormat.yMMM().format(_currentDate);
+                      });
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
-        ));
+            ),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16.0),
+              child: _calendarCarouselNoHeader,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
