@@ -8,7 +8,7 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
+// Run the app
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -44,45 +44,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // Today's date
   DateTime _currentDate = new DateTime.now();
-
-  DateTime _date = new DateTime.now();
-  TimeOfDay _time = new TimeOfDay.now();
-
+  // Date selected by the user
+  DateTime _selectedDate = new DateTime.now();
+  // Time selected by the user
+  TimeOfDay _selectedTime = new TimeOfDay.now();
+  // Calendar's current month
   String _currentMonth = '';
 
-  // Select Date
+  // Select date from the calendar icon
   Future<Null> _selectDate(BuildContext context) async {
+    // Settings for date picker
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: _date,
+      initialDate: _selectedDate,
       firstDate: new DateTime(2016),
       lastDate: new DateTime(2029)
     );
 
-    if(picked != null && picked != _date) {
-      print('Date selected: ${_date.toString()}');
+    // If picked time is chosen and is not the same as the already selected date, update the selected date
+    if(picked != null && picked != _selectedDate) {
       setState(() {
-        _date = picked;
+        _selectedDate = picked;
+        //_currentDate = _date;
+        _currentMonth = DateFormat.yMMM().format(_currentDate);
       });
+      // Debug message
+      print('Date selected: ${_selectedDate.toString()}');
     };
   }
 
-  Future<Null> _selectTime(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker (
-      context: context,
-      initialTime: _time
-    );
-
-    if(picked != null && picked != _time) {
-      print('Time selected: ${_date.toString()}');
-      setState(() {
-        _time = picked;
-      });
-    }
-  }
-
-  // Events
+  // List of marked events
   EventList<Event> _markedDateMap = new EventList<Event>(
     events: {
       new DateTime(2018, 12, 10): [
@@ -98,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    /// Add more events to _markedDateMap EventList
+    // Add more events to _markedDateMap EventList
     _markedDateMap.add(
         new DateTime(2018, 12, 25),
         new Event(
@@ -117,19 +110,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /// Example Calendar Carousel without header and custom prev & next button
+    // Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
       // Switch to day pressed
       onDayPressed: (DateTime date, List<Event> events) {
-        this.setState(() => _currentDate = date);
+        this.setState(() => _selectedDate = date);
         events.forEach((event) => print(event.title));
       },
 
-      thisMonthDayBorderColor: Colors.grey,
+      // Calendar Carousel custom settings
       weekFormat: false,
       markedDatesMap: _markedDateMap,
       height: 420.0,
-      selectedDateTime: _currentDate,
+      selectedDateTime: _selectedDate,
       customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateShowIcon: true,
       markedDateIconMaxShown: 1,
@@ -139,6 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return event.icon;
       },
 
+      // Calendar colors
       todayTextStyle: TextStyle(
         color: Colors.white,
       ),
@@ -155,8 +149,11 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.black,
       ),
 
-      minSelectedDate: _currentDate,
-      maxSelectedDate: _currentDate.add(Duration(days: 60)),
+      // Most recent date that is interactive
+      minSelectedDate: _currentDate.subtract(Duration(days: 1)),
+      maxSelectedDate: new DateTime(2029),
+
+      // When calendar changes, update the month
       onCalendarChanged: (DateTime date) {
         this.setState(() => _currentMonth = DateFormat.yMMM().format(date));
       },
@@ -178,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             //custom icon
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 16.0),
+              margin: EdgeInsets.symmetric(horizontal: 12.0),
               child: _calendarCarousel,
             ), // This trailing comma makes auto-formatting nicer for build methods.
 
@@ -209,10 +206,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.keyboard_arrow_left),
                     onPressed: () {
                       setState(() {
-                        _currentDate =
-                          _currentDate.subtract(Duration(days: 30));
+                        _selectedDate =
+                          _selectedDate.subtract(Duration(days: 30));
                         _currentMonth =
-                          DateFormat.yMMM().format(_currentDate);
+                          DateFormat.yMMM().format(_selectedDate);
                       });
                     },
                   ),
@@ -226,8 +223,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.keyboard_arrow_right),
                     onPressed: () {
                       setState(() {
-                        _currentDate = _currentDate.add(Duration(days: 30));
-                        _currentMonth = DateFormat.yMMM().format(_currentDate);
+                        _selectedDate = _selectedDate.add(Duration(days: 30));
+                        _currentMonth = DateFormat.yMMM().format(_selectedDate);
                       });
                     },
                   ),
@@ -247,36 +244,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _pushNewEvent() {
     final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-    DateTime selectedDate = _date;
+    DateTime _eventDate = _selectedDate;
 
     // Select Date
     Future<Null> _selectDate(BuildContext context) async {
       final DateTime picked = await showDatePicker(
           context: context,
-          initialDate: _date,
+          initialDate: _eventDate,
           firstDate: new DateTime(2016),
           lastDate: new DateTime(2029)
       );
 
-      if(picked != null && picked != _date) {
-        print('Date selected: ${_date.toString()}');
+      if(picked != null && picked != _eventDate) {
         setState(() {
-          _date = picked;
+          _eventDate = picked;
         });
+        print('Event date selected: ${_eventDate.toString()}');
       };
     }
 
     Future<Null> _selectTime(BuildContext context) async {
       final TimeOfDay picked = await showTimePicker (
           context: context,
-          initialTime: _time
+          initialTime: _selectedTime
       );
 
-      if(picked != null && picked != _time) {
-        print('Time selected: ${_date.toString()}');
+      if(picked != null && picked != _selectedTime) {
         setState(() {
-          _time = picked;
+          _selectedTime = picked;
         });
+        print('Time selected: ${_selectedTime.toString()}');
       }
     }
 
@@ -292,8 +289,6 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Add Event'),
             ),
 
-
-
             body: new SafeArea(
                 top: false,
                 bottom: false,
@@ -303,30 +298,68 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: new ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       children: <Widget>[
+
+
                         new TextFormField(
+
                           decoration: const InputDecoration(
                             //icon: const Icon(Icons.event),
                             labelText: 'Enter title',
                           ),
                         ),
 
-                        Row(
-                          children: [
-                            new IconButton(
-                                icon: Icon(Icons.calendar_today),
-                                onPressed: (){_selectDate(context);}
-                            ),
+                        new Container(
+                            padding: const EdgeInsets.only(top: 17.0),
+                            child: new Row(
+                              children: [
+                                new IconButton(
+                                    icon: Icon(Icons.calendar_today),
+                                    onPressed: (){
+                                      _selectDate(context);
+                                    }
+                                ),
 
-                            new Text('Date: ${DateFormat('MMMM dd, yyyy').format(_date)}'),
-                          ],
+                                new Text(
+                                  'Date: ${DateFormat('MMMM dd, yyyy').format(_eventDate)}',
+                                  style: new TextStyle(
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+
+                              ],
+                            ),
                         ),
+
+                        new Container(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: new Row(
+                            children: [
+                              new IconButton(
+                                  icon: Icon(Icons.access_time),
+                                  onPressed: (){
+                                    _selectTime(context);
+                                  }
+                              ),
+
+                              new Text(
+                                'Time: ${DateFormat('h:mm a').format(_eventDate)}',
+                                style: new TextStyle(
+                                  fontSize: 16.0,
+                                )
+                              ),
+                            ],
+                          ),
+                        ),
+
 
                         new TextFormField(
                           decoration: const InputDecoration(
                             icon: const Icon(Icons.calendar_today),
                             labelText: 'Date',
                           ),
-                          keyboardType: TextInputType.datetime,
+
+                          //keyboardType: TextInputType.datetime,
+                          //  onPressed: (){_selectDate(context);},
                         ),
 
                         new TextFormField(
