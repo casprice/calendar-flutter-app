@@ -82,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  // Events
   EventList<Event> _markedDateMap = new EventList<Event>(
     events: {
       new DateTime(2018, 12, 10): [
@@ -132,8 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
       customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateShowIcon: true,
       markedDateIconMaxShown: 1,
-      markedDateMoreShowTotal:
-      false, // null for not showing hidden events indicator
+      markedDateMoreShowTotal: false, // null for not showing hidden events indicator
       showHeader: false,
       markedDateIconBuilder: (event) {
         return event.icon;
@@ -247,9 +247,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _pushNewEvent() {
     final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-    List<String> _colors = <String>['', 'red', 'green', 'blue', 'orange'];
-    String _color = '';
-    // Route to favorites page
+    DateTime selectedDate = _date;
+
+    // Select Date
+    Future<Null> _selectDate(BuildContext context) async {
+      final DateTime picked = await showDatePicker(
+          context: context,
+          initialDate: _date,
+          firstDate: new DateTime(2016),
+          lastDate: new DateTime(2029)
+      );
+
+      if(picked != null && picked != _date) {
+        print('Date selected: ${_date.toString()}');
+        setState(() {
+          _date = picked;
+        });
+      };
+    }
+
+    Future<Null> _selectTime(BuildContext context) async {
+      final TimeOfDay picked = await showTimePicker (
+          context: context,
+          initialTime: _time
+      );
+
+      if(picked != null && picked != _time) {
+        print('Time selected: ${_date.toString()}');
+        setState(() {
+          _time = picked;
+        });
+      }
+    }
+
+    // Route to new event page
     Navigator.of(context).push(
       // Pushes the route to the favorites page to the Navigator's stack
       new MaterialPageRoute<void>(
@@ -260,6 +291,9 @@ class _MyHomePageState extends State<MyHomePage> {
             appBar: new AppBar(
               title: const Text('Add Event'),
             ),
+
+
+
             body: new SafeArea(
                 top: false,
                 bottom: false,
@@ -271,64 +305,44 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: <Widget>[
                         new TextFormField(
                           decoration: const InputDecoration(
-                            icon: const Icon(Icons.person),
-                            hintText: 'Event',
+                            //icon: const Icon(Icons.event),
                             labelText: 'Enter title',
                           ),
                         ),
-                        
-                        new IconButton(
-                            icon: Icon(Icons.calendar_today),
-                            onPressed: (){_selectDate(context);}
+
+                        Row(
+                          children: [
+                            new IconButton(
+                                icon: Icon(Icons.calendar_today),
+                                onPressed: (){_selectDate(context);}
+                            ),
+
+                            new Text('Date: ${DateFormat('MMMM dd, yyyy').format(_date)}'),
+                          ],
                         ),
-                        new Text('Date selected: ${DateFormat('MMMM dd, yyyy').format(_date)}'),
+
                         new TextFormField(
                           decoration: const InputDecoration(
                             icon: const Icon(Icons.calendar_today),
-                            hintText: 'Enter your date of birth',
-                            labelText: 'Dob',
+                            labelText: 'Date',
                           ),
                           keyboardType: TextInputType.datetime,
                         ),
 
                         new TextFormField(
                           decoration: const InputDecoration(
-                            icon: const Icon(Icons.email),
-                            hintText: 'Enter a email address',
-                            labelText: 'Email',
+                            icon: const Icon(Icons.watch_later),
+                            labelText: 'Time',
                           ),
-                          keyboardType: TextInputType.emailAddress,
                         ),
-                        new FormField(
-                          builder: (FormFieldState state) {
-                            return InputDecorator(
-                              decoration: InputDecoration(
-                                icon: const Icon(Icons.color_lens),
-                                labelText: 'Color',
-                              ),
-                              isEmpty: _color == '',
-                              child: new DropdownButtonHideUnderline(
-                                child: new DropdownButton(
-                                  value: _color,
-                                  isDense: true,
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      //newContact.favoriteColor = newValue;
-                                      _color = newValue;
-                                      state.didChange(newValue);
-                                    });
-                                  },
-                                  items: _colors.map((String value) {
-                                    return new DropdownMenuItem(
-                                      value: value,
-                                      child: new Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            );
-                          },
+
+                        new TextFormField(
+                          decoration: const InputDecoration(
+                            icon: const Icon(Icons.location_on),
+                            labelText: 'Location',
+                          ),
                         ),
+
                         new Container(
                             padding: const EdgeInsets.only(left: 40.0, top: 20.0),
                             child: new RaisedButton(
@@ -340,11 +354,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                 )
             ),
+
+
+
+
           );
         },
       ),
     );
   }
-
-
 }
